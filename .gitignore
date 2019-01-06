@@ -1,1 +1,4 @@
 carts/demos
+carts/*.js
+carts/*.html
+carts/*.p8.png
