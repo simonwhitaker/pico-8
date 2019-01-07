@@ -7,19 +7,19 @@ __lua__
 -- variables
 ship_tick = 1
 bg_tick = 1
-ship_sprite=1
-x=64
-y=100
-speed=1
-shots={}
-bg_offset=0
+ship_sprite = 1
+x = 64
+y = 100
+speed = 1
+shots = {}
+bg_offset = 0
 
 -- constants
-xmin=0
-xmax=120
-ymin=80
-ymax=120
-shot_speed=2
+xmin = 0
+xmax = 120
+ymin = 80
+ymax = 120
+shot_speed = 2
 ship_tick_max = 3
 bg_tick_max = 4
 
