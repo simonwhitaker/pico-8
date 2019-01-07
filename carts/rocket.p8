@@ -3,10 +3,10 @@ version 16
 __lua__
 -- rocket shooter
 -- by s1mn
+
 -- variables
-tick=1
-ticks_per_ship_frame=3
-ticks_per_bg_frame=4
+ship_tick = 1
+bg_tick = 1
 ship_sprite=1
 x=64
 y=100
@@ -20,6 +20,17 @@ xmax=120
 ymin=80
 ymax=120
 shot_speed=2
+ship_tick_max = 3
+bg_tick_max = 4
+
+-- offsets in pixels from the
+-- origin of the ship sprite
+-- to the pixel immediately in
+-- front of its nose (i.e.
+-- the point shots will appear
+-- when first fired)
+fire_offset_x = 3
+fire_offset_y = -1
 
 function fire(_x, _y)
   -- add x, y to shots, first
@@ -27,74 +38,112 @@ function fire(_x, _y)
   -- offset from x, y of ship
   -- sprite to x, y of nose of
   -- ship
-  add(shots, {_x+3,_y-1})
+  local x = _x + fire_offset_x
+  local y = _y + fire_offset_y
+  shot = {x=x, y=y}
+  add(shots, shot)
+
+  -- pew!
   sfx(0)
 end
 
-function _update()
-  tick+=1
-  if tick%ticks_per_ship_frame==0 then
-    ship_sprite+=1
-    if ship_sprite>4 then ship_sprite=1 end
-  end
-  if tick%ticks_per_bg_frame==0 then
-    bg_offset+=1
-    if bg_offset>127 then bg_offset=0 end
+function animate()
+  -- animate ship
+  ship_tick += 1
+  if ship_tick > ship_tick_max then
+    ship_tick = 1
+    ship_sprite += 1
+    if ship_sprite > 4 then
+      ship_sprite = 1
+    end
   end
 
+  -- animate background
+  bg_tick += 1
+  if bg_tick > bg_tick_max then
+    bg_tick = 1
+    bg_offset += 1
+    if bg_offset > 127 then
+      bg_offset = 0
+    end
+  end
+
+  -- animate shots
+  for shot in all(shots) do
+    -- move the shot one pixel
+    -- up the screen
+    shot.y -= shot_speed
+    -- if the shot is now off
+    -- the screen, delete it
+    -- from the list of shots
+    if shot.y < 1 then
+      del(shots, shot)
+    end
+  end
+end
+
+function decr(val, step, limit)
+  result = val - step
+  if result < limit then
+    return limit
+  end
+  return result
+end
+
+function incr(val, step, limit)
+  result = val + step
+  if result > limit then
+    return limit
+  end
+  return result
+end
+
+function handle_keys()
   -- left
   if btn(0) then
-    x-=speed
-    if x<xmin then x=xmin end
+    x = decr(x, speed, xmin)
   end
 
   -- right
   if btn(1) then
-    x+=speed
-    if x>xmax then x=xmax end
+    x = incr(x, speed, xmax)
   end
 
   -- up
   if btn(2) then
-    y-=speed
-    if y<ymin then y = ymin end
+    y = decr(y, speed, ymin)
   end
 
   -- down
   if btn(3) then
-    y+=speed
-    if y>ymax then y = ymax end
+    y = incr(y, speed, ymax)
   end
 
   -- fire
   if btnp(4) then
     fire(x, y)
   end
-  
-  -- move existing shots
-  for shot in all(shots) do
-    shot[2]-=shot_speed
-    if shot[2]<1 then
-      del(shots,shot)
-    end
-  end
 end
+
+function _update()
+  animate()
+  handle_keys()
+  end
 
 
 function _draw()
-  cls()
+  rectfill(0, 0, 127, 127, 1)
+
   -- draw background
-  map(0,0,0,bg_offset)
-  map(0,0,0,bg_offset-128)  
-  
+  map(0, 0, 0, bg_offset)
+  map(0, 0, 0, bg_offset-128)
+
   -- draw ship
-  spr(ship_sprite,x,y)
-  
+  spr(ship_sprite, x, y)
+
   -- draw shots
   for shot in all(shots) do
-    _x=shot[1]
-    _y=shot[2]
-    pset(_x,_y,7)
+    pset(shot.x, shot.y, 7)
   end
 end
 
