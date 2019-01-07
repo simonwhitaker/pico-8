@@ -38,9 +38,9 @@ function fire(_x, _y)
   -- offset from x, y of ship
   -- sprite to x, y of nose of
   -- ship
-  local x = _x + fire_offset_x
-  local y = _y + fire_offset_y
-  shot = {x=x, y=y}
+  shot = {}
+  shot.x = _x + fire_offset_x
+  shot.y = _y + fire_offset_y
   add(shots, shot)
 
   -- pew!
