@@ -70,13 +70,13 @@ function animate()
 
   -- animate shots
   for shot in all(shots) do
-    -- move the shot one pixel
-    -- up the screen
+    -- move the shot up the
+    -- screen
     shot.y -= shot_speed
     -- if the shot is now off
     -- the screen, delete it
     -- from the list of shots
-    if shot.y < 1 then
+    if shot.y < 0 then
       del(shots, shot)
     end
   end
