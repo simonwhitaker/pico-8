@@ -13,7 +13,9 @@ end
 tgt={}
 tgt.x=1
 tgt.y=1
-cur=copy_table(tgt)
+cur={}
+cur.x=1
+cur.y=1
 max_x=10
 max_y=10
 -- clue_mode
@@ -25,7 +27,7 @@ cell_width=12
 
 function get_new_target()
   new_tgt=copy_table(tgt)
-  while(new_tgt==tgt) do
+  while(new_tgt.x==tgt.x and new_tgt.y==tgt.y) do
     new_tgt.x=flr(rnd(max_x))+1
     new_tgt.y=flr(rnd(max_y))+1
   end
@@ -95,20 +97,30 @@ function has_won()
   return result
 end
 
+cooldown=0
 function _update()
 
-  if (has_won()) then
+  if (has_won() and cooldown==0) then
     sfx(1)
-    new_a=tgt.x
-    new_b=tgt.y
-    while(new_a==tgt.x and new_b==tgt.y) do
-      new_a=flr(rnd(max_x))+1
-      new_b=flr(rnd(max_y))+1
-    end
-    tgt.x=new_a
-    tgt.y=new_b
-    clue_mode=flr(rnd(2))
+    cooldown=40
   end
+
+  if (cooldown>0) then
+    cooldown-=1
+    if (cooldown==0) then
+      new_a=tgt.x
+      new_b=tgt.y
+      while(new_a==tgt.x and new_b==tgt.y) do
+        new_a=flr(rnd(max_x))+1
+        new_b=flr(rnd(max_y))+1
+      end
+      tgt.x=new_a
+      tgt.y=new_b
+      clue_mode=flr(rnd(2))
+    end
+    return
+  end
+
   if (btnp(0)) then
     cur.x-=1
     if (cur.x < 1) then
